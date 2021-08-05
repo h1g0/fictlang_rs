@@ -1,15 +1,15 @@
-use std::collections::HashMap;
 use rand::Rng;
+use std::collections::HashMap;
 
-pub struct CharSet{
-    vowels: HashMap<char,f32>,
-    consonants: HashMap<char,f32>,
+pub struct CharSet {
+    vowels: HashMap<char, f32>,
+    consonants: HashMap<char, f32>,
     vowel_total_probability: f32,
     consonant_total_probability: f32,
 }
 
-impl CharSet{
-    pub fn new() -> CharSet{
+impl CharSet {
+    pub fn new() -> CharSet {
         let mut vowels = HashMap::new();
         let mut consonants = HashMap::new();
 
@@ -56,7 +56,7 @@ impl CharSet{
             consonant_total_probability += probability;
         }
 
-        return CharSet{
+        return CharSet {
             vowels,
             consonants,
             vowel_total_probability,
@@ -75,7 +75,7 @@ impl CharSet{
         panic!("No vowel found");
     }
     fn get_random_consonant(&self) -> char {
-        let mut random_number = rand::thread_rng().gen_range(0.0.. self.consonant_total_probability);
+        let mut random_number = rand::thread_rng().gen_range(0.0..self.consonant_total_probability);
         for (consonant, probability) in self.consonants.iter() {
             if random_number < *probability {
                 return *consonant;
@@ -85,31 +85,56 @@ impl CharSet{
         panic!("No consonant found");
     }
 
-    fn get_random_word(&self) -> String {
+    fn get_random_word(&self, upper_case: bool) -> String {
         let mut word = String::new();
 
-        loop{
+        let mut first_letter = true;
+        loop {
             let phonological_pattern_no = rand::thread_rng().gen_range(0..4);
             match phonological_pattern_no {
-                0 => { // V
+                0 => {
+                    // V
+                    if upper_case && first_letter {
+                        word.push(self.get_random_vowel().to_ascii_uppercase());
+                        first_letter = false;
+                    } else {
+                        word.push(self.get_random_vowel());
+                    }
+                }
+                1 => {
+                    // CV
+                    if upper_case && first_letter {
+                        word.push(self.get_random_consonant().to_ascii_uppercase());
+                        first_letter = false;
+                    } else {
+                        word.push(self.get_random_consonant());
+                    }
                     word.push(self.get_random_vowel());
-                },
-                1 => { // CV
+                }
+                2 => {
+                    // VC
+                    if upper_case && first_letter {
+                        word.push(self.get_random_vowel().to_ascii_uppercase());
+                        first_letter = false;
+                    } else {
+                        word.push(self.get_random_vowel());
+                    }
                     word.push(self.get_random_consonant());
+                }
+                3 => {
+                    // CVC
+                    if upper_case && first_letter {
+                        word.push(self.get_random_consonant().to_ascii_uppercase());
+                        first_letter = false;
+                    } else {
+                        word.push(self.get_random_consonant());
+                    }
                     word.push(self.get_random_vowel());
-                },
-                2 => { // VC
-                    word.push(self.get_random_vowel());
                     word.push(self.get_random_consonant());
-                },
-                3 => { // CVC
-                    word.push(self.get_random_consonant());
-                    word.push(self.get_random_vowel());
-                    word.push(self.get_random_consonant());
-                },
+                }
                 _ => {}
             }
-            if rand::thread_rng().gen_range(0..3) == 0 {
+            if rand::thread_rng().gen_range(0.0..1.0) < 0.5 {
                 break;
             }
         }
@@ -118,26 +143,31 @@ impl CharSet{
 
     pub fn get_random_sentence(&self) -> String {
         let mut sentence = Vec::new();
-        loop{
-            sentence.push(self.get_random_word());
-            let terminator = rand::thread_rng().gen_range(0.0.. 1.0);
+        let mut first_word = true;
+        loop {
+            let upper_case = if first_word || rand::thread_rng().gen_range(0.0..1.0) < 0.2 {
+                true
+            } else {
+                false
+            };
+            sentence.push(self.get_random_word(upper_case));
+            first_word = false;
+            let terminator = rand::thread_rng().gen_range(0.0..1.0);
             if terminator < 0.2 {
                 if terminator < 0.06 {
                     sentence.push(".".to_string());
-                } else if terminator < 0.1{
+                } else if terminator < 0.1 {
                     sentence.push("?".to_string());
-                } else if terminator < 0.12{
+                } else if terminator < 0.12 {
                     sentence.push("!".to_string());
                 } else {
                     sentence.push(",".to_string());
                 }
                 break;
-            }else {
+            } else {
                 sentence.push(" ".to_string());
             }
-
         }
         return sentence.join("");
     }
-
 }
