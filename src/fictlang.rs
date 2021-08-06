@@ -1,4 +1,5 @@
 use rand::Rng;
+use rand_distr::{num_traits::ToPrimitive, StandardNormal};
 use std::collections::HashMap;
 
 pub struct CharSet {
@@ -85,7 +86,7 @@ impl CharSet {
         panic!("No consonant found");
     }
 
-    fn get_random_word(&self, upper_case: bool) -> String {
+    fn get_random_word(&self, upper_case: bool, word_length: usize) -> String {
         let mut word = String::new();
 
         let mut first_letter = true;
@@ -134,7 +135,7 @@ impl CharSet {
                 }
                 _ => {}
             }
-            if rand::thread_rng().gen_range(0.0..1.0) < 0.5 {
+            if word.len() >= word_length {
                 break;
             }
         }
@@ -150,7 +151,14 @@ impl CharSet {
             } else {
                 false
             };
-            sentence.push(self.get_random_word(upper_case));
+            let word_lenf =
+                (5.0 + rand::thread_rng().sample::<f32, _>(StandardNormal) * 2.0).round();
+            let word_lenu = if word_lenf < 1.0 {
+                1usize
+            } else {
+                word_lenf.to_usize().unwrap_or_else(|| 1usize)
+            };
+            sentence.push(self.get_random_word(upper_case, word_lenu));
             first_word = false;
             let terminator = rand::thread_rng().gen_range(0.0..1.0);
             if terminator < 0.2 {
