@@ -1,5 +1,5 @@
-mod fictlang;
-use fictlang::*;
+mod char_set;
+use char_set::*;
 
 fn main() {
     let fl = CharSet::new();
