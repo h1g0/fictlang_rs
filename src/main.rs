@@ -1,6 +1,7 @@
 mod char_set;
 use char_set::*;
 mod phoneme_set;
+mod word_set;
 fn main() {
     let fl = CharSet::new();
     for _ in 0..10{
