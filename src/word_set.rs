@@ -1,9 +1,17 @@
+use rand::Rng;
+
 pub struct Prefix {
     pub conjugation: Vec<String>,
 }
 impl Prefix {
     pub fn new(conjugation: Vec<String>) -> Prefix {
         Prefix { conjugation }
+    }
+    pub fn get_random(&self) -> String {
+        self.conjugation
+            .get(rand::thread_rng().gen_range(0..self.conjugation.len() as usize))
+            .unwrap()
+            .clone()
     }
 }
 pub struct PrefixSet {
@@ -21,6 +29,12 @@ pub struct Suffix {
 impl Suffix {
     pub fn new(conjugation: Vec<String>) -> Suffix {
         Suffix { conjugation }
+    }
+    pub fn get_random(&self) -> String {
+        self.conjugation
+            .get(rand::thread_rng().gen_range(0..self.conjugation.len() as usize))
+            .unwrap()
+            .clone()
     }
 }
 pub struct SuffixSet {
